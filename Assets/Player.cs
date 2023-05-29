@@ -5,8 +5,12 @@ using UnityEngine;
 public class Player : MonoBehaviour
 {
     [Header("Move Info")]
-    [SerializeField] public float xSpeed;
-    [SerializeField] public float jumpForce;
+    public float xSpeed;
+    public float jumpForce;
+    public float dashColddown = 5f;
+    public float dashSpeed;
+    public float dashDuration;
+    public float dashTime;
 
     [Header("Collision Info")]
     [SerializeField] public float groundCheckDistance;
@@ -30,6 +34,7 @@ public class Player : MonoBehaviour
     public PlayerMoveState moveState { get; private set; }
     public PlayerJumpState jumpState { get; private set; }
     public PlayerAirState airState { get; private set; }
+    public PlayerDashState dashState { get; private set; }
     #endregion
     
     private void Awake()
@@ -39,6 +44,8 @@ public class Player : MonoBehaviour
         idleState = new PlayerIdleState(this, stateMachine, "Idle");
         moveState = new PlayerMoveState(this, stateMachine, "Move");
         jumpState = new PlayerJumpState(this, stateMachine, "Jump");
+        airState = new PlayerJumpState(this, stateMachine, "Jump");
+        dashState = new PlayerDashState(this, stateMachine, "Dash");
     }
 
     private void Start()
@@ -51,6 +58,15 @@ public class Player : MonoBehaviour
     private void Update()
     {
         stateMachine.currentState.Update();
+        dashTime -= Time.deltaTime;
+        checkForDash();
+    }
+    private void checkForDash()
+    {
+        if (Input.GetKeyDown(KeyCode.LeftShift) && dashTime < 0)
+        {
+            stateMachine.ChangeState(dashState);
+        }
     }
 
     public void SetVelocity(float _xInput, float _yInput)

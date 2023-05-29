@@ -26,5 +26,7 @@ public class PlayerGroundedState : PlayerState
         {
             stateMachine.ChangeState(player.jumpState);        
         }
+
+        
     }    
 }
